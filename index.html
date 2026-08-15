@@ -1367,15 +1367,23 @@
            FIRESTORE CRUD
            ========================================== */
         if(db) {
-            // Realtime Listener
             const postsRef = collection(db, 'posts');
-            const q = query(postsRef, orderBy('pinned', 'desc'), orderBy('timestamp', 'desc'));
+            
+            // Yahan se humne 'pinned' hatakar query simple kar di taaki Firebase Index error na de
+            const q = query(postsRef, orderBy('timestamp', 'desc'));
             
             onSnapshot(q, (snapshot) => {
-                state.posts = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                let fetchedPosts = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                
+                // JavaScript ke through pinned posts ko upar (top par) set karna
+                fetchedPosts.sort((a, b) => (b.pinned ? 1 : 0) - (a.pinned ? 1 : 0));
+                
+                state.posts = fetchedPosts;
                 updateCounters();
                 renderPosts();
-            }, (error) => console.log("Firestore error:", error));
+            }, (error) => {
+                console.log("Firestore render error:", error);
+            });
         }
 
         const updateCounters = () => {
