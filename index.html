@@ -1339,7 +1339,7 @@
             if(e.dataTransfer.files.length) handleFile(e.dataTransfer.files[0]);
         });
 
-        const compressImage = (file) => {
+        const compressImageToBase64 = (file) => {
             return new Promise((resolve) => {
                 const reader = new FileReader();
                 reader.readAsDataURL(file);
@@ -1349,20 +1349,19 @@
                     img.onload = () => {
                         const canvas = document.createElement('canvas');
                         const ctx = canvas.getContext('2d');
-                        const MAX_WIDTH = 1200;
-                        const MAX_HEIGHT = 1200;
+                        const MAX_WIDTH = 800;
+                        const MAX_HEIGHT = 800;
                         let width = img.width; let height = img.height;
-
                         if (width > height && width > MAX_WIDTH) { height *= MAX_WIDTH / width; width = MAX_WIDTH; } 
                         else if (height > MAX_HEIGHT) { width *= MAX_HEIGHT / height; height = MAX_HEIGHT; }
-
                         canvas.width = width; canvas.height = height;
                         ctx.drawImage(img, 0, 0, width, height);
-                        canvas.toBlob(blob => resolve(blob), 'image/jpeg', 0.8);
+                        resolve(canvas.toDataURL('image/jpeg', 0.6));
                     };
                 };
             });
         };
+
 
         /* ==========================================
            FIRESTORE CRUD
@@ -1399,7 +1398,7 @@
             window.requestAnimationFrame(step);
         }
 
-        elements.postForm.addEventListener('submit', async () => {
+                elements.postForm.addEventListener('submit', async () => {
             if(!state.isAdmin) return;
             
             const caption = elements.captionInput.value.trim();
@@ -1408,49 +1407,30 @@
 
             try {
                 if(state.editPostId) {
-                    // Update
                     const postRef = doc(db, 'posts', state.editPostId);
                     await updateDoc(postRef, { caption, pinned, updatedAt: serverTimestamp() });
                 } else {
-                    // Create
                     if(!currentFile) { alert("Please select an image"); elements.savePostBtn.disabled = false; return; }
                     
                     elements.uploadProgressContainer.style.display = 'block';
-                    elements.uploadProgressBar.style.width = '0%';
+                    elements.uploadProgressBar.style.width = '50%';
                     
-                    const compressedBlob = await compressImage(currentFile);
-                    const ext = currentFile.name.split('.').pop() || 'jpg';
-                    const filename = `posts/${Date.now()}_${Math.random().toString(36).substring(2)}.${ext}`;
-                    const storageRef = ref(storage, filename);
+                    const base64Image = await compressImageToBase64(currentFile);
+                    elements.uploadProgressBar.style.width = '90%';
                     
-                    const uploadTask = uploadBytesResumable(storageRef, compressedBlob);
-                    
-                    uploadTask.on('state_changed', 
-                        (snapshot) => {
-                            const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-                            elements.uploadProgressBar.style.width = progress + '%';
-                        }, 
-                        (error) => { throw error; }, 
-                        async () => {
-                            const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
-                            await addDoc(collection(db, 'posts'), {
-                                image: downloadURL,
-                                storagePath: filename,
-                                caption: caption,
-                                pinned: pinned,
-                                likes: [],
-                                timestamp: serverTimestamp(),
-                                hidden: false
-                            });
-                            closeAndResetPostModal();
-                        }
-                    );
-                    return; // Prevent final block execution until upload completes
+                    await addDoc(collection(db, 'posts'), {
+                        image: base64Image,
+                        caption: caption,
+                        pinned: pinned,
+                        likes: [],
+                        timestamp: serverTimestamp(),
+                        hidden: false
+                    });
                 }
                 closeAndResetPostModal();
             } catch(e) {
                 console.error(e);
-                alert("Operation failed.");
+                alert("Operation failed. Try a smaller image.");
                 elements.savePostBtn.disabled = false;
             }
         });
@@ -1460,8 +1440,10 @@
             elements.postForm.reset();
             elements.savePostBtn.disabled = false;
             elements.uploadProgressContainer.style.display = 'none';
+            elements.imagePreview.style.display = 'none';
             currentFile = null;
         };
+
 
         // Edit
         window.editPost = (id) => {
@@ -1486,17 +1468,11 @@
             openDialog(elements.deleteModal);
         };
 
-        elements.confirmDeleteBtn.addEventListener('click', async () => {
+                elements.confirmDeleteBtn.addEventListener('click', async () => {
             if(!state.isAdmin || !state.deletePostId) return;
             elements.confirmDeleteBtn.disabled = true;
             elements.confirmDeleteBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
             try {
-                // Delete image from storage
-                if(state.deleteImagePath) {
-                    const imgRef = ref(storage, state.deleteImagePath);
-                    try { await deleteObject(imgRef); } catch(e) { console.log("Storage delete error", e); }
-                }
-                // Delete doc
                 await deleteDoc(doc(db, 'posts', state.deletePostId));
                 closeDialog(elements.deleteModal);
             } catch(e) {
@@ -1506,18 +1482,9 @@
                 elements.confirmDeleteBtn.disabled = false;
                 elements.confirmDeleteBtn.textContent = 'Delete';
                 state.deletePostId = null;
-                state.deleteImagePath = null;
             }
         });
 
-        // Like System (Public allowed)
-        window.toggleLike = async (id) => {
-            if(!db) return;
-            const post = state.posts.find(p => p.id === id);
-            if(!post) return;
-
-            const likes = post.likes || [];
-            const hasLiked = likes.includes(state.deviceId);
             
             // Optimistic UI update
             const btn = document.querySelector(`.like-btn[data-id="${id}"]`);
@@ -1544,7 +1511,6 @@
                 console.error("Like failed", e);
                 renderPosts(); // Revert on failure
             }
-        };
 
         // Share
         window.sharePost = async (id) => {
