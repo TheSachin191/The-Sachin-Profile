@@ -1,0 +1,1623 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>The Sachin - Curious Mind</title>
+    
+    <!-- SEO & OpenGraph -->
+    <meta name="description" content="Personal profile of The Sachin - Web Designing Enthusiast, Intermediate Video Editor, Creative Explorer, Curious Mind.">
+    <meta property="og:title" content="The Sachin - Profile">
+    <meta property="og:description" content="Web Designing Enthusiast & Intermediate Video Editor">
+    <meta property="og:image" content="0c301df3-e804-42fe-842f-14cc0e9f4705-1_all_19450.webp">
+    <meta property="og:type" content="website">
+    <meta name="twitter:card" content="summary_large_image">
+    <link rel="canonical" href="https://yourwebsite.com">
+    
+    <!-- PWA Manifest Link (Generated dynamically in JS) -->
+    <link id="manifest-link" rel="manifest" href="">
+    <meta name="theme-color" content="#0f172a">
+    <link rel="apple-touch-icon" href="0c301df3-e804-42fe-842f-14cc0e9f4705-1_all_19450.webp">
+
+    <!-- Fonts & Icons -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            /* Light Theme */
+            --bg-base: #f8fafc;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --glass-bg: rgba(255, 255, 255, 0.7);
+            --glass-border: rgba(255, 255, 255, 0.5);
+            --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.05);
+            --primary: #3b82f6;
+            --primary-hover: #2563eb;
+            --accent: #8b5cf6;
+            --danger: #ef4444;
+            --success: #10b981;
+            --card-bg: #ffffff;
+            --particle-color: rgba(59, 130, 246, 0.2);
+            --blob-1: #e0e7ff;
+            --blob-2: #f3e8ff;
+        }
+
+        [data-theme="dark"] {
+            /* Dark Theme */
+            --bg-base: #020617;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --glass-bg: rgba(15, 23, 42, 0.6);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+            --primary: #60a5fa;
+            --primary-hover: #3b82f6;
+            --accent: #a78bfa;
+            --card-bg: #0f172a;
+            --particle-color: rgba(96, 165, 250, 0.15);
+            --blob-1: #1e1b4b;
+            --blob-2: #0f172a;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+            transition: background-color 0.3s ease, border-color 0.3s ease;
+        }
+
+        body {
+            background-color: var(--bg-base);
+            color: var(--text-main);
+            overflow-x: hidden;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Particle Canvas */
+        #particle-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: -2;
+            pointer-events: none;
+        }
+
+        /* Background Blobs */
+        .blob {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(80px);
+            z-index: -1;
+            opacity: 0.6;
+            animation: float 20s infinite alternate;
+        }
+        .blob-1 {
+            width: 400px;
+            height: 400px;
+            background: var(--blob-1);
+            top: -100px;
+            left: -100px;
+        }
+        .blob-2 {
+            width: 500px;
+            height: 500px;
+            background: var(--blob-2);
+            bottom: -150px;
+            right: -100px;
+            animation-delay: -5s;
+        }
+
+        @keyframes float {
+            0% { transform: translate(0, 0) scale(1); }
+            33% { transform: translate(30px, -50px) scale(1.1); }
+            66% { transform: translate(-20px, 20px) scale(0.9); }
+            100% { transform: translate(0, 0) scale(1); }
+        }
+
+        /* Glassmorphism Utilities */
+        .glass {
+            background: var(--glass-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--glass-border);
+            box-shadow: var(--glass-shadow);
+        }
+
+        /* Header */
+        header {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 100;
+            padding: 1rem 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .header-scrolled {
+            border-bottom: 1px solid var(--glass-border);
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+        }
+
+        .logo {
+            font-family: 'Poppins', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            cursor: pointer;
+            text-decoration: none;
+        }
+
+        .nav-actions {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .icon-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-main);
+            font-size: 1.2rem;
+            cursor: pointer;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+        }
+        .icon-btn:hover {
+            background: var(--glass-border);
+            transform: scale(1.05);
+        }
+
+        .search-container {
+            position: relative;
+            display: none;
+            align-items: center;
+        }
+        .search-container.active {
+            display: flex;
+            animation: slideInRight 0.3s ease forwards;
+        }
+        .search-input {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            color: var(--text-main);
+            padding: 0.5rem 1rem 0.5rem 2.5rem;
+            border-radius: 20px;
+            outline: none;
+            width: 200px;
+            font-size: 0.9rem;
+        }
+        .search-icon-inside {
+            position: absolute;
+            left: 10px;
+            color: var(--text-muted);
+        }
+
+        @keyframes slideInRight {
+            from { opacity: 0; transform: translateX(20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        /* Buttons */
+        .btn {
+            padding: 0.6rem 1.2rem;
+            border-radius: 20px;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.9rem;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            color: white;
+            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(59, 130, 246, 0.6);
+        }
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--glass-border);
+            color: var(--text-main);
+        }
+        .btn-outline:hover {
+            background: var(--glass-border);
+        }
+        .admin-only {
+            display: none;
+        }
+        body.is-admin .admin-only {
+            display: inline-flex;
+        }
+
+        /* Main Container */
+        main {
+            padding: 100px 5% 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
+            flex-grow: 1;
+        }
+
+        /* Hero & Profile Section */
+        .hero-profile {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            gap: 2rem;
+            margin-bottom: 4rem;
+            padding-top: 2rem;
+        }
+        @media (min-width: 768px) {
+            .hero-profile {
+                flex-direction: row;
+                text-align: left;
+                justify-content: space-between;
+                align-items: center;
+            }
+        }
+
+        .hero-text {
+            flex: 1;
+        }
+        .hero-title {
+            font-family: 'Poppins', sans-serif;
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(135deg, var(--text-main), var(--text-muted));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .typing-container {
+            font-size: 1.5rem;
+            color: var(--primary);
+            font-weight: 500;
+            height: 30px;
+            margin-bottom: 1rem;
+        }
+        .cursor {
+            display: inline-block;
+            width: 3px;
+            height: 1em;
+            background-color: var(--primary);
+            animation: blink 0.7s infinite;
+            vertical-align: middle;
+        }
+        @keyframes blink { 50% { opacity: 0; } }
+
+        .hero-subtitle {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+            line-height: 1.6;
+            margin-bottom: 1.5rem;
+            max-width: 500px;
+        }
+
+        .profile-card {
+            padding: 2rem;
+            border-radius: 24px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+            width: 100%;
+            max-width: 350px;
+            position: relative;
+            overflow: hidden;
+        }
+        .profile-card::before {
+            content: '';
+            position: absolute;
+            top: -50%; left: -50%;
+            width: 200%; height: 200%;
+            background: conic-gradient(transparent, var(--primary), transparent 30%);
+            animation: rotate 4s linear infinite;
+            opacity: 0.1;
+        }
+        @keyframes rotate { 100% { transform: rotate(360deg); } }
+
+        .profile-img-container {
+            position: relative;
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            padding: 4px;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            box-shadow: 0 0 20px rgba(59, 130, 246, 0.4);
+            z-index: 1;
+        }
+        .profile-img {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 4px solid var(--bg-base);
+        }
+
+        .stats {
+            display: flex;
+            gap: 2rem;
+            width: 100%;
+            justify-content: center;
+            z-index: 1;
+        }
+        .stat-item {
+            text-align: center;
+        }
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+        .stat-label {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .socials {
+            display: flex;
+            gap: 2rem; /* Icon ke beech ki doori badhane ke liye */
+            justify-content: center; /* Center me lane ke liye */
+            width: 10%;
+            margin-top: 1rem; /* Stats aur icon ke beech thoda gap dene ke liye */
+            z-index: 1;
+        }
+
+        .social-link {
+            color: var(--text-main);
+            font-size: 2rem;
+            transition: all 0.3s ease;
+            display: inline-block;
+        }
+        .social-link:hover {
+            transform: translateY(-3px) scale(1.1);
+            color: var(--primary);
+        }
+        .fa-youtube:hover { color: #ff0000; }
+        .fa-whatsapp:hover { color: #25D366; }
+
+        /* Posts Grid */
+        .section-title {
+            font-family: 'Poppins', sans-serif;
+            font-size: 2rem;
+            margin-bottom: 2rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        .section-title::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: var(--glass-border);
+        }
+
+        .posts-grid {
+            display: grid;
+            grid-template-columns: repeat(1, 1fr);
+            gap: 2rem;
+            width: 100%;
+        }
+        @media (min-width: 640px) { .posts-grid { grid-template-columns: repeat(2, 1fr); } }
+        @media (min-width: 1024px) { .posts-grid { grid-template-columns: repeat(3, 1fr); } }
+
+        .post-card {
+            border-radius: 20px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            animation: fadeIn 0.5s ease backwards;
+            position: relative;
+        }
+        .post-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 40px rgba(0,0,0,0.1);
+        }
+
+        .post-img-container {
+            width: 100%;
+            aspect-ratio: 1 / 1;
+            overflow: hidden;
+            position: relative;
+            cursor: pointer;
+            background: var(--glass-border);
+        }
+        .post-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+        .post-img-container:hover .post-img {
+            transform: scale(1.05);
+        }
+        
+        .pin-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: var(--primary);
+            color: white;
+            padding: 0.3rem;
+            border-radius: 50%;
+            width: 30px; height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            z-index: 2;
+        }
+
+        .post-content {
+            padding: 1.2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+            flex-grow: 1;
+        }
+
+        .post-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .action-group {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+        .action-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-main);
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: color 0.2s, transform 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+        .action-btn:hover { transform: scale(1.1); }
+        .like-btn.liked { color: var(--danger); animation: heartPop 0.3s ease; }
+        
+        @keyframes heartPop {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.3); }
+            100% { transform: scale(1); }
+        }
+
+        .post-caption {
+            font-size: 0.95rem;
+            line-height: 1.5;
+            color: var(--text-main);
+            word-wrap: break-word;
+            white-space: pre-wrap;
+        }
+        .post-date {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-top: auto;
+        }
+
+        .admin-controls {
+            display: none;
+            gap: 0.5rem;
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid var(--glass-border);
+        }
+        body.is-admin .admin-controls { display: flex; }
+        
+        .admin-btn {
+            flex: 1;
+            padding: 0.4rem;
+            font-size: 0.8rem;
+            border-radius: 8px;
+            border: 1px solid var(--glass-border);
+            background: transparent;
+            color: var(--text-main);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .admin-btn:hover { background: var(--glass-border); }
+        .admin-btn.delete:hover { background: rgba(239, 68, 68, 0.1); color: var(--danger); border-color: var(--danger); }
+
+        /* Empty State */
+        .empty-state {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 4rem 1rem;
+            color: var(--text-muted);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+        }
+        .empty-state i { font-size: 3rem; opacity: 0.5; }
+
+        /* Modals / Dialogs */
+        dialog {
+            margin: auto;
+            border: none;
+            border-radius: 24px;
+            background: transparent;
+            padding: 0;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+        dialog::backdrop {
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+        }
+        .dialog-content {
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            background: var(--card-bg);
+            color: var(--text-main);
+            border: 1px solid var(--glass-border);
+        }
+        
+        .dialog-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+        .close-dialog {
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        .form-group label {
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+        .form-control {
+            width: 100%;
+            padding: 0.8rem;
+            border-radius: 12px;
+            border: 1px solid var(--glass-border);
+            background: var(--bg-base);
+            color: var(--text-main);
+            font-family: inherit;
+            outline: none;
+            transition: border-color 0.2s;
+            resize: vertical;
+        }
+        .form-control:focus { border-color: var(--primary); }
+
+        .drop-zone {
+            width: 100%;
+            height: 150px;
+            border: 2px dashed var(--glass-border);
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            color: var(--text-muted);
+            position: relative;
+            overflow: hidden;
+        }
+        .drop-zone.dragover {
+            border-color: var(--primary);
+            background: rgba(59, 130, 246, 0.05);
+        }
+        .drop-zone img {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: none;
+        }
+        
+        .progress-bar-container {
+            width: 100%;
+            height: 6px;
+            background: var(--glass-border);
+            border-radius: 3px;
+            overflow: hidden;
+            display: none;
+        }
+        .progress-bar {
+            height: 100%;
+            background: var(--primary);
+            width: 0%;
+            transition: width 0.3s;
+        }
+
+  /* Lightbox */
+        .lightbox {
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            background: rgba(0,0,0,0.9);
+            z-index: 1000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        .lightbox.active {
+            display: flex;
+            opacity: 1;
+        }
+        .lightbox-img {
+            max-width: 90%;
+            max-height: 90vh;
+            object-fit: contain;
+            border-radius: 8px;
+            transform: scale(0.9);
+            transition: transform 0.3s ease;
+            cursor: zoom-in;
+        }
+        .lightbox-img.zoomed {
+            transform: scale(1.5);
+            cursor: zoom-out;
+        }
+        .lightbox-close {
+            position: absolute;
+            top: 20px; right: 30px;
+            color: white;
+            font-size: 2rem;
+            cursor: pointer;
+            background: transparent;
+            border: none;
+        }
+
+        /* Loader */
+        .loader-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: var(--bg-base);
+            z-index: 9999;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: opacity 0.5s ease;
+        }
+        .spinner {
+            width: 50px; height: 50px;
+            border: 4px solid var(--glass-border);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* Utilities */
+        .hidden { display: none !important; }
+        .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); border: 0; }
+    </style>
+</head>
+<body data-theme="dark">
+    <!-- Loader -->
+    <div class="loader-overlay" id="globalLoader">
+        <div class="spinner"></div>
+    </div>
+
+    <!-- Background Elements -->
+    <canvas id="particle-canvas"></canvas>
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+
+    <!-- Header -->
+    <header id="header" class="glass">
+        <a href="#" class="logo">Sachin.</a>
+        
+        <div class="nav-actions">
+            <div class="search-container" id="searchContainer">
+                <i class="fa-solid fa-search search-icon-inside"></i>
+                <input type="text" id="searchInput" class="search-input" placeholder="Search posts..." aria-label="Search posts">
+            </div>
+            
+            <button class="icon-btn" id="searchBtn" aria-label="Toggle Search" title="Search">
+                <i class="fa-solid fa-search"></i>
+            </button>
+            <button class="icon-btn" id="themeToggle" aria-label="Toggle Theme" title="Toggle Theme">
+                <i class="fa-solid fa-sun"></i>
+            </button>
+            
+            <button class="btn btn-primary admin-only" id="addPostBtn" title="Add New Post">
+                <i class="fa-solid fa-plus"></i> <span class="hide-mobile">New Post</span>
+            </button>
+            
+            <button class="icon-btn" id="authBtn" aria-label="Login/Logout" title="Admin Login">
+                <i class="fa-solid fa-user-shield"></i>
+            </button>
+        </div>
+    </header>
+
+    <main>
+        <!-- Hero & Profile Section -->
+        <section class="hero-profile">
+            <div class="hero-text">
+                <h1 class="hero-title">Hi, I'm The Sachin</h1>
+                <div class="typing-container">
+                    <span id="typingText"></span><span class="cursor"></span>
+                </div>
+                <p class="hero-subtitle">
+                    Web Designing Enthusiast | Intermediate Video Editor | Creative Explorer | Curious Mind . <br>
+                    Welcome to my personal digital space where I share my journey, thoughts, and moments.
+                </p>
+ 
+            <div class="profile-card glass">
+                <div class="profile-img-container">
+                    <!-- Placeholder Comment: Replace this image with your own profile photo. -->
+                    <img src="hero.Webp" alt="The Sachin" class="profile-img" onerror="this.src='data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22150%22%20height%3D%22150%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22%23ccc%22%3E%3Cpath%20d%3D%22M12%2012c2.21%200%204-1.79%204-4s-1.79-4-4-4-4%201.79-4%204%201.79%204%204%204zm0%202c-2.67%200-8%201.34-8%204v2h16v-2c0-2.66-5.33-4-8-4z%22%2F%3E%3C%2Fsvg%3E'">
+                </div>
+                
+                <div class="stats">
+                    <div class="stat-item">
+                        <div class="stat-value" id="totalPostsCounter">0</div>
+                        <div class="stat-label">Posts</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="totalLikesCounter">0</div>
+                        <div class="stat-label">Likes</div>
+                    <div class="socials">
+                    <a href="https://youtube.com/@thesachin191?si=Pa5sq_83ad4x_GvU" target="_blank" rel="noopener" class="social-link" aria-label="YouTube"><i class="fa-brands fa-youtube"></i></a>
+                    <a href="https://www.whatsapp.com/channel/0029VbDNMvI5PO189EfY2X2J" target="_blank" rel="noopener" class="social-link" aria-label="WhatsApp"><i class="fa-brands fa-whatsapp"></i></a>
+                </div>
+                    </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Posts Section -->
+        <section>
+            <h2 class="section-title"><i class="fa-regular fa-images"></i> My Feed</h2>
+            <div id="postsGrid" class="posts-grid">
+                <!-- Posts will be injected here via JS -->
+            </div>
+        </section>
+    </main>
+
+    <!-- Modals -->
+    
+    <!-- Upload/Edit Post Modal -->
+    <dialog id="postModal" class="glass">
+        <div class="dialog-content glass">
+            <div class="dialog-header">
+                <span id="postModalTitle">Create Post</span>
+                <button class="close-dialog" data-close="postModal">&times;</button>
+            </div>
+            
+            <form id="postForm" onsubmit="event.preventDefault();">
+                <input type="hidden" id="postIdInput">
+                
+                <div class="form-group" id="imageUploadGroup">
+                    <label>Image</label>
+                    <div class="drop-zone" id="dropZone">
+                        <i class="fa-solid fa-cloud-arrow-up fa-2x"></i>
+                        <span>Drag & drop or click to upload</span>
+                        <input type="file" id="fileInput" accept="image/*" class="sr-only">
+                        <img id="imagePreview" alt="Preview">
+                    </div>
+                    <div class="progress-bar-container" id="uploadProgressContainer">
+                        <div class="progress-bar" id="uploadProgressBar"></div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="captionInput">Caption</label>
+                    <textarea id="captionInput" class="form-control" rows="3" placeholder="Write something..."></textarea>
+                </div>
+
+                <div class="form-group" style="flex-direction: row; align-items: center; gap: 0.5rem;">
+                    <input type="checkbox" id="pinInput">
+                    <label for="pinInput" style="cursor: pointer;">Pin to top</label>
+                </div>
+
+                <button type="submit" class="btn btn-primary" id="savePostBtn" style="width: 100%; justify-content: center; margin-top: 1rem;">
+                    Post
+                </button>
+            </form>
+        </div>
+    </dialog>
+
+    <!-- Delete Confirmation Modal -->
+    <dialog id="deleteModal" class="glass">
+        <div class="dialog-content glass" style="text-align: center; gap: 1rem;">
+            <i class="fa-solid fa-triangle-exclamation" style="font-size: 3rem; color: var(--danger);"></i>
+            <h3>Delete Post?</h3>
+            <p style="color: var(--text-muted); font-size: 0.9rem;">This action cannot be undone.</p>
+            <div style="display: flex; gap: 1rem; margin-top: 1rem;">
+                <button class="btn btn-outline" style="flex:1; justify-content: center;" data-close="deleteModal">Cancel</button>
+                <button class="btn btn-primary" style="flex:1; justify-content: center; background: var(--danger);" id="confirmDeleteBtn">Delete</button>
+            </div>
+        </div>
+    </dialog>
+
+    <!-- Auth Modal -->
+    <dialog id="authModal" class="glass">
+        <div class="dialog-content glass">
+            <div class="dialog-header">
+                <span>Admin Login</span>
+                <button class="close-dialog" data-close="authModal">&times;</button>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 1rem;">
+                <p style="font-size: 0.9rem; color: var(--text-muted);">Only authorized administrator can log in to manage content.</p>
+                <button class="btn btn-primary" id="googleLoginBtn" style="justify-content: center;">
+                    <i class="fa-brands fa-google"></i> Continue with Google
+                </button>
+                <div style="text-align: center; color: var(--text-muted); font-size: 0.8rem; margin: 0.5rem 0;">OR</div>
+                <form id="emailLoginForm" style="display: flex; flex-direction: column; gap: 1rem;" onsubmit="event.preventDefault();">
+                    <input type="email" id="authEmail" class="form-control" placeholder="Admin Email" required>
+                    <input type="password" id="authPassword" class="form-control" placeholder="Password" required>
+                    <button type="submit" class="btn btn-outline" style="justify-content: center;" id="emailLoginBtn">Login</button>
+                </form>
+                <button class="btn btn-outline hidden" id="logoutBtn" style="justify-content: center; border-color: var(--danger); color: var(--danger);">
+                    Logout
+                </button>
+            </div>
+        </div>
+    </dialog>
+
+    <!-- Lightbox -->
+    <div class="lightbox" id="lightbox">
+        <button class="lightbox-close" id="lightboxClose">&times;</button>
+        <img src="" alt="Fullscreen view" class="lightbox-img" id="lightboxImg">
+    </div>
+
+    <!-- PWA & Application Logic -->
+    <script type="module">
+        /* ==========================================
+           FIREBASE CONFIGURATION
+           ========================================== 
+           Replace the empty strings with your actual Firebase Project credentials.
+           1. Go to Firebase Console -> Project Settings
+           2. Create a Web App
+           3. Copy the config object values below.
+           
+           SECURITY RULES (Paste these in Firebase Console):
+           
+           Firestore Rules:
+           rules_version = '2';
+           service cloud.firestore {
+             match /databases/{database}/documents {
+               match /posts/{postId} {
+                 // Public can read. Public can ONLY update the 'likes' array field for liking.
+                 allow read: if true;
+                 allow create, delete: if request.auth != null && request.auth.token.email == 'admin@example.com';
+                 allow update: if (request.auth != null && request.auth.token.email == 'admin@example.com') 
+                               || request.resource.data.diff(resource.data).affectedKeys().hasOnly(['likes']);
+               }
+             }
+           }
+
+           Storage Rules:
+           rules_version = '2';
+           service firebase.storage {
+             match /b/{bucket}/o {
+               match /{allPaths=**} {
+                 allow read: if true;
+                 allow write: if request.auth != null && request.auth.token.email == 'admin@example.com';
+               }
+             }
+           }
+        */
+        
+        const firebaseConfig = {
+            apiKey: "AIzaSyB1TaBGwQsTtNrGfOdDD_nM--UeNyq9xko",
+            authDomain: "the-sachin-55ed9.firebaseapp.com",
+            projectId: "the-sachin-55ed9",
+            storageBucket: "the-sachin-55ed9.firebasestorage.app",
+            messagingSenderId: "927044745632",
+            appId: "1:927044745632:web:eef43df9057fe73264ccc5",
+            measurementId: "G-XQH2X8F7M3"
+        };
+
+
+        const ADMIN_EMAIL = "sachinmaurya9507@gmail.com"; // Set your admin email here
+
+        // Import Firebase SDKs (v10 modular via CDN)
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { 
+            getAuth, signInWithPopup, GoogleAuthProvider, 
+            signInWithEmailAndPassword, onAuthStateChanged, signOut 
+        } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import { 
+            getFirestore, collection, addDoc, onSnapshot, 
+            query, orderBy, deleteDoc, doc, updateDoc, serverTimestamp, getDoc 
+        } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { 
+            getStorage, ref, uploadBytesResumable, getDownloadURL, deleteObject 
+        } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-storage.js";
+
+        // Initialize Firebase (wrapped in try-catch to prevent crash if config is empty during initial deployment test)
+        let app, auth, db, storage;
+        try {
+            app = initializeApp(firebaseConfig);
+            auth = getAuth(app);
+            db = getFirestore(app);
+            storage = getStorage(app);
+        } catch(e) {
+            console.warn("Firebase not configured. Please add config.", e);
+        }
+
+        /* ==========================================
+           PWA SETUP (Inline)
+           ========================================== */
+        const setupPWA = () => {
+            const manifest = {
+                name: "The Sachin Profile",
+                short_name: "Sachin",
+                description: "Personal portfolio and social profile",
+                start_url: "./",
+                display: "standalone",
+                background_color: "#020617",
+                theme_color: "#0f172a",
+                icons: [{
+                    src: "0c301df3-e804-42fe-842f-14cc0e9f4705-1_all_19450.webp",
+                    sizes: "192x192",
+                    type: "image/webp"
+                }]
+            };
+            const manifestBlob = new Blob([JSON.stringify(manifest)], {type: 'application/json'});
+            document.getElementById('manifest-link').href = URL.createObjectURL(manifestBlob);
+
+            const swCode = `
+                const CACHE_NAME = 'sachin-v1';
+                self.addEventListener('install', e => e.waitUntil(self.skipWaiting()));
+                self.addEventListener('activate', e => e.waitUntil(self.clients.claim()));
+                self.addEventListener('fetch', e => {
+                    if (e.request.method !== 'GET' || e.request.url.includes('firestore') || e.request.url.includes('identitytoolkit')) return;
+                    e.respondWith(fetch(e.request).catch(() => caches.match(e.request)));
+                });
+            `;
+            const swBlob = new Blob([swCode], {type: 'application/javascript'});
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.register(URL.createObjectURL(swBlob)).catch(err => console.log('SW Reg failed', err));
+            }
+        };
+        setupPWA();
+
+        /* ==========================================
+           STATE & DOM ELEMENTS
+           ========================================== */
+        const state = {
+            isAdmin: false,
+            posts: [],
+            deviceId: localStorage.getItem('deviceId') || crypto.randomUUID(),
+            searchQuery: '',
+            editPostId: null,
+            deletePostId: null,
+            deleteImagePath: null
+        };
+        if(!localStorage.getItem('deviceId')) localStorage.setItem('deviceId', state.deviceId);
+
+        // Elements
+        const elements = {
+            body: document.body,
+            themeToggle: document.getElementById('themeToggle'),
+            globalLoader: document.getElementById('globalLoader'),
+            searchBtn: document.getElementById('searchBtn'),
+            searchContainer: document.getElementById('searchContainer'),
+            searchInput: document.getElementById('searchInput'),
+            authBtn: document.getElementById('authBtn'),
+            addPostBtn: document.getElementById('addPostBtn'),
+            postsGrid: document.getElementById('postsGrid'),
+            totalPosts: document.getElementById('totalPostsCounter'),
+            totalLikes: document.getElementById('totalLikesCounter'),
+            header: document.getElementById('header'),
+            
+            // Modals
+            authModal: document.getElementById('authModal'),
+            postModal: document.getElementById('postModal'),
+            deleteModal: document.getElementById('deleteModal'),
+            
+            // Post Form
+            postForm: document.getElementById('postForm'),
+            postModalTitle: document.getElementById('postModalTitle'),
+            dropZone: document.getElementById('dropZone'),
+            fileInput: document.getElementById('fileInput'),
+            imagePreview: document.getElementById('imagePreview'),
+            captionInput: document.getElementById('captionInput'),
+            pinInput: document.getElementById('pinInput'),
+            uploadProgressContainer: document.getElementById('uploadProgressContainer'),
+            uploadProgressBar: document.getElementById('uploadProgressBar'),
+            savePostBtn: document.getElementById('savePostBtn'),
+            imageUploadGroup: document.getElementById('imageUploadGroup'),
+            
+            // Auth Form
+            googleLoginBtn: document.getElementById('googleLoginBtn'),
+            emailLoginForm: document.getElementById('emailLoginForm'),
+            authEmail: document.getElementById('authEmail'),
+            authPassword: document.getElementById('authPassword'),
+            logoutBtn: document.getElementById('logoutBtn'),
+            
+            // Delete Form
+            confirmDeleteBtn: document.getElementById('confirmDeleteBtn'),
+            
+            // Lightbox
+            lightbox: document.getElementById('lightbox'),
+            lightboxImg: document.getElementById('lightboxImg'),
+            lightboxClose: document.getElementById('lightboxClose')
+        };
+
+        /* ==========================================
+           UI & INTERACTIONS
+           ========================================== */
+        
+        // Loader removal
+        window.addEventListener('load', () => {
+            setTimeout(() => elements.globalLoader.style.opacity = '0', 500);
+            setTimeout(() => elements.globalLoader.classList.add('hidden'), 1000);
+        });
+
+        // Theme
+        const initTheme = () => {
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme) {
+                elements.body.setAttribute('data-theme', savedTheme);
+            } else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches) {
+                elements.body.setAttribute('data-theme', 'light');
+            }
+     updateThemeIcon();
+        };
+        const toggleTheme = () => {
+            const currentTheme = elements.body.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            elements.body.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            updateThemeIcon();
+        };
+        const updateThemeIcon = () => {
+            const icon = elements.themeToggle.querySelector('i');
+            if (elements.body.getAttribute('data-theme') === 'dark') {
+                icon.className = 'fa-solid fa-sun';
+            } else {
+                icon.className = 'fa-solid fa-moon';
+            }
+        };
+        elements.themeToggle.addEventListener('click', toggleTheme);
+        initTheme();
+
+        // Header Scroll
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 50) elements.header.classList.add('header-scrolled');
+            else elements.header.classList.remove('header-scrolled');
+        });
+
+        // Search Toggle & Debounce
+        elements.searchBtn.addEventListener('click', () => {
+            elements.searchContainer.classList.toggle('active');
+            if(elements.searchContainer.classList.contains('active')) elements.searchInput.focus();
+            else { elements.searchInput.value = ''; state.searchQuery = ''; renderPosts(); }
+        });
+        let searchTimeout;
+        elements.searchInput.addEventListener('input', (e) => {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => {
+                state.searchQuery = e.target.value.toLowerCase();
+                renderPosts();
+            }, 300);
+        });
+
+        // Typing Effect
+        const typeLines = ["Web Designing Enthusiast", "Intermediate Video Editor", "Creative Explorer","Curious Mind"];
+        let typeIdx = 0, charIdx = 0, isDeleting = false;
+        const typingText = document.getElementById('typingText');
+        const typeEffect = () => {
+            const current = typeLines[typeIdx];
+            if(isDeleting) charIdx--; else charIdx++;
+            typingText.textContent = current.substring(0, charIdx);
+            
+            let speed = isDeleting ? 50 : 100;
+            if(!isDeleting && charIdx === current.length) { speed = 2000; isDeleting = true; }
+            else if(isDeleting && charIdx === 0) { isDeleting = false; typeIdx = (typeIdx + 1) % typeLines.length; speed = 500; }
+            
+            setTimeout(typeEffect, speed);
+        };
+        typeEffect();
+
+        // Dialog Handlers
+        const openDialog = (dialog) => { dialog.showModal(); };
+        const closeDialog = (dialog) => { dialog.close(); };
+        document.querySelectorAll('[data-close]').forEach(btn => {
+            btn.addEventListener('click', () => closeDialog(document.getElementById(btn.dataset.close)));
+        });
+        document.querySelectorAll('dialog').forEach(dialog => {
+            dialog.addEventListener('click', (e) => { if(e.target === dialog) dialog.close(); });
+        });
+
+        // Lightbox
+        const openLightbox = (src) => {
+            elements.lightboxImg.src = src;
+            elements.lightboxImg.classList.remove('zoomed');
+            elements.lightbox.classList.add('active');
+        };
+        elements.lightboxClose.addEventListener('click', () => elements.lightbox.classList.remove('active'));
+        elements.lightbox.addEventListener('click', (e) => {
+            if(e.target === elements.lightbox) elements.lightbox.classList.remove('active');
+        });
+        elements.lightboxImg.addEventListener('click', () => {
+            elements.lightboxImg.classList.toggle('zoomed');
+        });
+        document.addEventListener('keydown', (e) => {
+            if(e.key === 'Escape' && elements.lightbox.classList.contains('active')) elements.lightbox.classList.remove('active');
+        });
+
+        /* ==========================================
+           PARTICLE SYSTEM (Pure JS)
+           ========================================== */
+        const canvas = document.getElementById('particle-canvas');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+        let mouse = { x: null, y: null, radius: 150 };
+
+        const resizeCanvas = () => { canvas.width = window.innerWidth; canvas.height = window.innerHeight; };
+        window.addEventListener('resize', resizeCanvas);
+        window.addEventListener('mousemove', (e) => { mouse.x = e.x; mouse.y = e.y; });
+        window.addEventListener('mouseout', () => { mouse.x = null; mouse.y = null; });
+        resizeCanvas();
+
+        class Particle {
+            constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.size = Math.random() * 2 + 1;
+                this.baseX = this.x;
+                this.baseY = this.y;
+                this.density = (Math.random() * 30) + 1;
+                this.vx = (Math.random() - 0.5) * 0.5;
+                this.vy = (Math.random() - 0.5) * 0.5;
+            }
+            draw() {
+                ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--particle-color').trim();
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.closePath();
+                ctx.fill();
+            }
+            update() {
+                this.x += this.vx; this.y += this.vy;
+                if(this.x < 0 || this.x > canvas.width) this.vx = -this.vx;
+                if(this.y < 0 || this.y > canvas.height) this.vy = -this.vy;
+
+                if (mouse.x != null) {
+                    let dx = mouse.x - this.x;
+                    let dy = mouse.y - this.y;
+                    let distance = Math.sqrt(dx * dx + dy * dy);
+                    let forceDirX = dx / distance;
+                    let forceDirY = dy / distance;
+                    let maxDistance = mouse.radius;
+                    let force = (maxDistance - distance) / maxDistance;
+                    let dirX = forceDirX * force * this.density;
+                    let dirY = forceDirY * force * this.density;
+
+                    if (distance < maxDistance) {
+                        this.x -= dirX;
+                        this.y -= dirY;
+                    }
+                }
+            }
+        }
+        const initParticles = () => {
+            particles = [];
+            const numParticles = Math.min((canvas.width * canvas.height) / 15000, 100);
+            for(let i = 0; i < numParticles; i++) particles.push(new Particle());
+        };
+        const animateParticles = () => {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            for(let i = 0; i < particles.length; i++) {
+                particles[i].update();
+                particles[i].draw();
+            }
+            requestAnimationFrame(animateParticles);
+        };
+        initParticles();
+        animateParticles();
+
+        /* ==========================================
+           AUTH LOGIC
+           ========================================== */
+        if(auth) {
+            onAuthStateChanged(auth, (user) => {
+                if (user && user.email === ADMIN_EMAIL) {
+                    state.isAdmin = true;
+                    elements.body.classList.add('is-admin');
+                    elements.googleLoginBtn.classList.add('hidden');
+                    elements.emailLoginForm.classList.add('hidden');
+                    elements.logoutBtn.classList.remove('hidden');
+                } else {
+                    state.isAdmin = false;
+                    elements.body.classList.remove('is-admin');
+                    elements.googleLoginBtn.classList.remove('hidden');
+                    elements.emailLoginForm.classList.remove('hidden');
+                    elements.logoutBtn.classList.add('hidden');
+                    if(user) signOut(auth); // Sign out unauthorized users
+                }
+                renderPosts();
+            });
+
+            elements.authBtn.addEventListener('click', () => openDialog(elements.authModal));
+            
+            elements.googleLoginBtn.addEventListener('click', async () => {
+                try {
+                    const provider = new GoogleAuthProvider();
+                    await signInWithPopup(auth, provider);
+                    closeDialog(elements.authModal);
+                } catch (error) { alert(error.message); }
+            });
+
+            elements.emailLoginForm.addEventListener('submit', async (e) => {
+                try {
+                    await signInWithEmailAndPassword(auth, elements.authEmail.value, elements.authPassword.value);
+                    closeDialog(elements.authModal);
+                    elements.authEmail.value = ''; elements.authPassword.value = '';
+                } catch (error) { alert("Login failed. Check credentials."); }
+            });
+
+            elements.logoutBtn.addEventListener('click', async () => {
+                await signOut(auth);
+                closeDialog(elements.authModal);
+            });
+        }
+
+        /* ==========================================
+           IMAGE UPLOAD & COMPRESSION
+           ========================================== */
+        let currentFile = null;
+        
+        elements.addPostBtn.addEventListener('click', () => {
+            state.editPostId = null;
+            elements.postForm.reset();
+            elements.imagePreview.style.display = 'none';
+            elements.imagePreview.src = '';
+            elements.postModalTitle.textContent = 'Create Post';
+            elements.imageUploadGroup.style.display = 'flex';
+            currentFile = null;
+            elements.savePostBtn.textContent = 'Post';
+            openDialog(elements.postModal);
+        });
+
+        const handleFile = (file) => {
+            if(!file || !file.type.startsWith('image/')) return;
+            currentFile = file;
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                elements.imagePreview.src = e.target.result;
+                elements.imagePreview.style.display = 'block';
+            };
+            reader.readAsDataURL(file);
+        };
+
+        elements.dropZone.addEventListener('click', () => elements.fileInput.click());
+        elements.fileInput.addEventListener('change', (e) => handleFile(e.target.files[0]));
+        
+        elements.dropZone.addEventListener('dragover', (e) => { e.preventDefault(); elements.dropZone.classList.add('dragover'); });
+        elements.dropZone.addEventListener('dragleave', () => elements.dropZone.classList.remove('dragover'));
+        elements.dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            elements.dropZone.classList.remove('dragover');
+            if(e.dataTransfer.files.length) handleFile(e.dataTransfer.files[0]);
+        });
+
+        const compressImageToBase64 = (file) => {
+            return new Promise((resolve) => {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = event => {
+                    const img = new Image();
+                    img.src = event.target.result;
+                    img.onload = () => {
+                        const canvas = document.createElement('canvas');
+                        const ctx = canvas.getContext('2d');
+                        const MAX_WIDTH = 800;
+                        const MAX_HEIGHT = 800;
+                        let width = img.width; let height = img.height;
+                        if (width > height && width > MAX_WIDTH) { height *= MAX_WIDTH / width; width = MAX_WIDTH; } 
+                        else if (height > MAX_HEIGHT) { width *= MAX_HEIGHT / height; height = MAX_HEIGHT; }
+                        canvas.width = width; canvas.height = height;
+                        ctx.drawImage(img, 0, 0, width, height);
+                        resolve(canvas.toDataURL('image/jpeg', 0.6));
+                    };
+                };
+            });
+        };
+
+
+        /* ==========================================
+           FIRESTORE CRUD
+           ========================================== */
+        if(db) {
+            // Realtime Listener
+            const postsRef = collection(db, 'posts');
+            const q = query(postsRef, orderBy('pinned', 'desc'), orderBy('timestamp', 'desc'));
+            
+            onSnapshot(q, (snapshot) => {
+                state.posts = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                updateCounters();
+                renderPosts();
+            }, (error) => console.log("Firestore error:", error));
+        }
+
+        const updateCounters = () => {
+            elements.totalPosts.textContent = state.posts.length;
+            const totalL = state.posts.reduce((sum, p) => sum + (p.likes ? p.likes.length : 0), 0);
+            
+            // Animate counter
+            animateValue(elements.totalLikes, parseInt(elements.totalLikes.textContent), totalL, 500);
+        };
+
+        const animateValue = (obj, start, end, duration) => {
+            if (start === end) return;
+            let startTimestamp = null;
+            const step = (timestamp) => {
+                if (!startTimestamp) startTimestamp = timestamp;
+                const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+                obj.innerHTML = Math.floor(progress * (end - start) + start);
+                if (progress < 1) window.requestAnimationFrame(step);
+            };
+            window.requestAnimationFrame(step);
+        }
+
+                elements.postForm.addEventListener('submit', async () => {
+            if(!state.isAdmin) return;
+            
+            const caption = elements.captionInput.value.trim();
+            const pinned = elements.pinInput.checked;
+            elements.savePostBtn.disabled = true;
+
+            try {
+                if(state.editPostId) {
+                    const postRef = doc(db, 'posts', state.editPostId);
+                    await updateDoc(postRef, { caption, pinned, updatedAt: serverTimestamp() });
+                } else {
+                    if(!currentFile) { alert("Please select an image"); elements.savePostBtn.disabled = false; return; }
+                    
+                    elements.uploadProgressContainer.style.display = 'block';
+                    elements.uploadProgressBar.style.width = '50%';
+                    
+                    const base64Image = await compressImageToBase64(currentFile);
+                    elements.uploadProgressBar.style.width = '90%';
+                    
+                    await addDoc(collection(db, 'posts'), {
+                        image: base64Image,
+                        caption: caption,
+                        pinned: pinned,
+                        likes: [],
+                        timestamp: serverTimestamp(),
+                        hidden: false
+                    });
+                }
+                closeAndResetPostModal();
+            } catch(e) {
+                console.error(e);
+                alert("Operation failed. Try a smaller image.");
+                elements.savePostBtn.disabled = false;
+            }
+        });
+
+        const closeAndResetPostModal = () => {
+            closeDialog(elements.postModal);
+            elements.postForm.reset();
+            elements.savePostBtn.disabled = false;
+            elements.uploadProgressContainer.style.display = 'none';
+            elements.imagePreview.style.display = 'none';
+            currentFile = null;
+        };
+
+
+        // Edit
+        window.editPost = (id) => {
+            if(!state.isAdmin) return;
+            const post = state.posts.find(p => p.id === id);
+            if(!post) return;
+            
+            state.editPostId = id;
+            elements.postModalTitle.textContent = 'Edit Post';
+            elements.imageUploadGroup.style.display = 'none'; // Editing image not supported in this basic flow without deleting, simplify to caption only
+            elements.captionInput.value = post.caption || '';
+            elements.pinInput.checked = post.pinned || false;
+            elements.savePostBtn.textContent = 'Update';
+            openDialog(elements.postModal);
+        };
+
+        // Delete
+        window.promptDelete = (id, storagePath) => {
+            if(!state.isAdmin) return;
+            state.deletePostId = id;
+            state.deleteImagePath = storagePath;
+            openDialog(elements.deleteModal);
+        };
+
+                elements.confirmDeleteBtn.addEventListener('click', async () => {
+            if(!state.isAdmin || !state.deletePostId) return;
+            elements.confirmDeleteBtn.disabled = true;
+            elements.confirmDeleteBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
+            try {
+                await deleteDoc(doc(db, 'posts', state.deletePostId));
+                closeDialog(elements.deleteModal);
+            } catch(e) {
+                console.error(e);
+                alert("Delete failed");
+            } finally {
+                elements.confirmDeleteBtn.disabled = false;
+                elements.confirmDeleteBtn.textContent = 'Delete';
+                state.deletePostId = null;
+            }
+        });
+
+            
+            // Optimistic UI update
+            const btn = document.querySelector(`.like-btn[data-id="${id}"]`);
+            const count = document.querySelector(`.like-count[data-id="${id}"]`);
+            if(btn && count) {
+                if(hasLiked) {
+                    btn.classList.remove('liked');
+                    btn.innerHTML = '<i class="fa-regular fa-heart"></i>';
+                    count.textContent = likes.length - 1;
+                } else {
+                    btn.classList.add('liked');
+                    btn.innerHTML = '<i class="fa-solid fa-heart"></i>';
+                    count.textContent = likes.length + 1;
+                }
+            }
+
+            try {
+                const postRef = doc(db, 'posts', id);
+                const updatedLikes = hasLiked 
+                    ? likes.filter(uid => uid !== state.deviceId)
+                    : [...likes, state.deviceId];
+                await updateDoc(postRef, { likes: updatedLikes });
+            } catch(e) {
+                console.error("Like failed", e);
+                renderPosts(); // Revert on failure
+            }
+
+        // Share
+        window.sharePost = async (id) => {
+            const url = `${window.location.origin}${window.location.pathname}?post=${id}`;
+            if (navigator.share) {
+                try {
+                    await navigator.share({
+                        title: 'The Sachin',
+                        text: 'Check out this post!',
+                        url: url
+                    });
+                } catch(e) {}
+            } else {
+                navigator.clipboard.writeText(url);
+                alert("Link copied to clipboard!");
+            }
+        };
+
+        // Open Lightbox globally
+        window.openImage = (src) => openLightbox(src);
+
+        /* ==========================================
+           RENDER POSTS
+           ========================================== */
+        const renderPosts = () => {
+            elements.postsGrid.innerHTML = '';
+            
+            let filteredPosts = state.posts.filter(p => !p.hidden || state.isAdmin);
+            
+            if(state.searchQuery) {
+                filteredPosts = filteredPosts.filter(p => 
+                    p.caption && p.caption.toLowerCase().includes(state.searchQuery)
+                );
+            }
+
+            if (filteredPosts.length === 0) {
+                elements.postsGrid.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fa-regular fa-folder-open"></i>
+                        <h3>No posts found</h3>
+                        <p>${state.searchQuery ? 'Try a different search term.' : 'Check back later for updates.'}</p>
+                    </div>`;
+                return;
+            }
+
+            const fragment = document.createDocumentFragment();
+            
+            filteredPosts.forEach(post => {
+                const dateStr = post.timestamp ? new Date(post.timestamp.toDate()).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : 'Just now';
+                const likesCount = post.likes ? post.likes.length : 0;
+                const hasLiked = post.likes && post.likes.includes(state.deviceId);
+                const safeCaption = post.caption ? post.caption.replace(/</g, "&lt;").replace(/>/g, "&gt;") : '';
+
+                const card = document.createElement('article');
+                card.className = 'post-card glass';
+                
+                let adminHtml = '';
+                if(state.isAdmin) {
+                    adminHtml = `
+                        <div class="admin-controls">
+                            <button class="admin-btn" onclick="editPost('${post.id}')"><i class="fa-solid fa-pen"></i> Edit</button>
+                            <button class="admin-btn delete" onclick="promptDelete('${post.id}', '${post.storagePath || ''}')"><i class="fa-solid fa-trash"></i> Delete</button>
+                        </div>
+                    `;
+                }
+
+                card.innerHTML = `
+                    ${post.pinned ? `<div class="pin-badge" title="Pinned Post"><i class="fa-solid fa-thumbtack"></i></div>` : ''}
+                    <div class="post-img-container" onclick="openImage('${post.image}')">
+                        <img src="${post.image}" alt="Post image" class="post-img" loading="lazy">
+                    </div>
+                    <div class="post-content">
+                        <div class="post-actions">
+                            <div class="action-group">
+                                <button class="action-btn like-btn ${hasLiked ? 'liked' : ''}" data-id="${post.id}" onclick="toggleLike('${post.id}')" aria-label="Like">
+                                    <i class="${hasLiked ? 'fa-solid' : 'fa-regular'} fa-heart"></i>
+                                </button>
+                                <span style="font-weight: 600; font-size: 0.9rem;" class="like-count" data-id="${post.id}">${likesCount}</span>
+                            </div>
+                            <button class="action-btn" onclick="sharePost('${post.id}')" aria-label="Share">
+                                <i class="fa-regular fa-paper-plane"></i>
+                            </button>
+                        </div>
+                        ${safeCaption ? `<p class="post-caption">${safeCaption}</p>` : ''}
+                        <span class="post-date">${dateStr}</span>
+                        ${adminHtml}
+                    </div>
+                `;
+                fragment.appendChild(card);
+            });
+            
+            elements.postsGrid.appendChild(fragment);
+        };
+
+        // Handle URL shared post
+        window.addEventListener('DOMContentLoaded', () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const postId = urlParams.get('post');
+            if(postId && db) {
+                getDoc(doc(db, 'posts', postId)).then(docSnap => {
+                    if(docSnap.exists() && docSnap.data().image) {
+                        openLightbox(docSnap.data().image);
+                    }
+                }).catch(()=>{});
+            }
+        });
+
+    </script>
+</body>
+</html>          
