@@ -831,17 +831,11 @@
                 <input type="hidden" id="postIdInput">
                 
                 <div class="form-group" id="imageUploadGroup">
-                    <label>Image</label>
-                    <div class="drop-zone" id="dropZone">
-                        <i class="fa-solid fa-cloud-arrow-up fa-2x"></i>
-                        <span>Drag & drop or click to upload</span>
-                        <input type="file" id="fileInput" accept="image/*" class="sr-only">
-                        <img id="imagePreview" alt="Preview">
-                    </div>
-                    <div class="progress-bar-container" id="uploadProgressContainer">
-                        <div class="progress-bar" id="uploadProgressBar"></div>
-                    </div>
+                    <label for="imageUrlInput" style="font-size: 0.9rem; font-weight: 500;">Image URL (Link)</label>
+                    <input type="url" id="imageUrlInput" class="form-control" placeholder="Paste image link here (http://...)" style="margin-top: 0.5rem;">
+                    <img id="imagePreview" style="display:none; width:100%; margin-top:10px; border-radius:12px; object-fit:cover;" alt="Preview">
                 </div>
+
 
                 <div class="form-group">
                     <label for="captionInput">Caption</label>
@@ -1303,64 +1297,31 @@
         /* ==========================================
            IMAGE UPLOAD & COMPRESSION
            ========================================== */
-        let currentFile = null;
-        
+        // Naya Post Button Click Handler
         elements.addPostBtn.addEventListener('click', () => {
             state.editPostId = null;
             elements.postForm.reset();
-            elements.imagePreview.style.display = 'none';
-            elements.imagePreview.src = '';
+            document.getElementById('imagePreview').style.display = 'none';
+            document.getElementById('imagePreview').src = '';
             elements.postModalTitle.textContent = 'Create Post';
             elements.imageUploadGroup.style.display = 'flex';
-            currentFile = null;
-            elements.savePostBtn.textContent = 'Post';
+            elements.savePostBtn.innerHTML = 'Post';
             openDialog(elements.postModal);
         });
 
-        const handleFile = (file) => {
-            if(!file || !file.type.startsWith('image/')) return;
-            currentFile = file;
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                elements.imagePreview.src = e.target.result;
-                elements.imagePreview.style.display = 'block';
-            };
-            reader.readAsDataURL(file);
-        };
-
-        elements.dropZone.addEventListener('click', () => elements.fileInput.click());
-        elements.fileInput.addEventListener('change', (e) => handleFile(e.target.files[0]));
-        
-        elements.dropZone.addEventListener('dragover', (e) => { e.preventDefault(); elements.dropZone.classList.add('dragover'); });
-        elements.dropZone.addEventListener('dragleave', () => elements.dropZone.classList.remove('dragover'));
-        elements.dropZone.addEventListener('drop', (e) => {
-            e.preventDefault();
-            elements.dropZone.classList.remove('dragover');
-            if(e.dataTransfer.files.length) handleFile(e.dataTransfer.files[0]);
+        // URL paste karte hi image ka preview dikhane ke liye
+        document.getElementById('imageUrlInput').addEventListener('input', (e) => {
+            const url = e.target.value.trim();
+            const preview = document.getElementById('imagePreview');
+            if(url) {
+                preview.src = url;
+                preview.style.display = 'block';
+            } else {
+                preview.style.display = 'none';
+                preview.src = '';
+            }
         });
 
-        const compressImageToBase64 = (file) => {
-            return new Promise((resolve) => {
-                const reader = new FileReader();
-                reader.readAsDataURL(file);
-                reader.onload = event => {
-                    const img = new Image();
-                    img.src = event.target.result;
-                    img.onload = () => {
-                        const canvas = document.createElement('canvas');
-                        const ctx = canvas.getContext('2d');
-                        const MAX_WIDTH = 800;
-                        const MAX_HEIGHT = 800;
-                        let width = img.width; let height = img.height;
-                        if (width > height && width > MAX_WIDTH) { height *= MAX_WIDTH / width; width = MAX_WIDTH; } 
-                        else if (height > MAX_HEIGHT) { width *= MAX_HEIGHT / height; height = MAX_HEIGHT; }
-                        canvas.width = width; canvas.height = height;
-                        ctx.drawImage(img, 0, 0, width, height);
-                        resolve(canvas.toDataURL('image/jpeg', 0.6));
-                    };
-                };
-            });
-        };
 
 
         /* ==========================================
@@ -1406,11 +1367,13 @@
             window.requestAnimationFrame(step);
         }
 
-                elements.postForm.addEventListener('submit', async () => {
+                        elements.postForm.addEventListener('submit', async () => {
             if(!state.isAdmin) return;
             
             const caption = elements.captionInput.value.trim();
             const pinned = elements.pinInput.checked;
+            const imageUrl = document.getElementById('imageUrlInput').value.trim();
+
             elements.savePostBtn.disabled = true;
 
             try {
@@ -1418,16 +1381,12 @@
                     const postRef = doc(db, 'posts', state.editPostId);
                     await updateDoc(postRef, { caption, pinned, updatedAt: serverTimestamp() });
                 } else {
-                    if(!currentFile) { alert("Please select an image"); elements.savePostBtn.disabled = false; return; }
+                    if(!imageUrl) { alert("Please paste an image link!"); elements.savePostBtn.disabled = false; return; }
                     
-                    elements.uploadProgressContainer.style.display = 'block';
-                    elements.uploadProgressBar.style.width = '50%';
-                    
-                    const base64Image = await compressImageToBase64(currentFile);
-                    elements.uploadProgressBar.style.width = '90%';
+                    elements.savePostBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Posting...';
                     
                     await addDoc(collection(db, 'posts'), {
-                        image: base64Image,
+                        image: imageUrl,
                         caption: caption,
                         pinned: pinned,
                         likes: [],
@@ -1438,8 +1397,9 @@
                 closeAndResetPostModal();
             } catch(e) {
                 console.error(e);
-                alert("Operation failed. Try a smaller image.");
+                alert("Operation failed.");
                 elements.savePostBtn.disabled = false;
+                elements.savePostBtn.innerHTML = 'Post';
             }
         });
 
@@ -1447,9 +1407,9 @@
             closeDialog(elements.postModal);
             elements.postForm.reset();
             elements.savePostBtn.disabled = false;
-            elements.uploadProgressContainer.style.display = 'none';
-            elements.imagePreview.style.display = 'none';
-            currentFile = null;
+            elements.savePostBtn.innerHTML = 'Post';
+            document.getElementById('imagePreview').style.display = 'none';
+            document.getElementById('imagePreview').src = '';
         };
 
 
@@ -1519,7 +1479,7 @@
                 console.error("Like failed", e);
                 renderPosts(); // Revert on failure
             }
-
+          
         // Share
         window.sharePost = async (id) => {
             const url = `${window.location.origin}${window.location.pathname}?post=${id}`;
