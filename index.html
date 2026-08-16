@@ -1527,47 +1527,67 @@
             const fragment = document.createDocumentFragment();
             
             filteredPosts.forEach(post => {
-                const dateStr = post.timestamp ? new Date(post.timestamp.toDate()).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : 'Just now';
-                const likesCount = post.likes ? post.likes.length : 0;
-                const hasLiked = post.likes && post.likes.includes(state.deviceId);
-                const safeCaption = post.caption ? post.caption.replace(/</g, "&lt;").replace(/>/g, "&gt;") : '';
+                // NAYA: Crash Protection Block
+                try { 
+                    // NAYA: Safe Date Handler
+                    let dateStr = 'Just now';
+                    if (post.timestamp && typeof post.timestamp.toDate === 'function') {
+                        dateStr = new Date(post.timestamp.toDate()).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+                    }
 
-                const card = document.createElement('article');
-                card.className = 'post-card glass';
-                
-                let adminHtml = '';
-                if(state.isAdmin) {
-                    adminHtml = `
-                        <div class="admin-controls">
-                            <button class="admin-btn" onclick="editPost('${post.id}')"><i class="fa-solid fa-pen"></i> Edit</button>
-                            <button class="admin-btn delete" onclick="promptDelete('${post.id}', '${post.storagePath || ''}')"><i class="fa-solid fa-trash"></i> Delete</button>
+                    const likesCount = post.likes ? post.likes.length : 0;
+                    const hasLiked = post.likes && post.likes.includes(state.deviceId);
+                    const safeCaption = post.caption ? post.caption.replace(/</g, "&lt;").replace(/>/g, "&gt;") : '';
+
+                    const card = document.createElement('article');
+                    card.className = 'post-card glass';
+                    
+                    let adminHtml = '';
+                    if(state.isAdmin) {
+                        adminHtml = `
+                            <div class="admin-controls">
+                                <button class="admin-btn delete" onclick="promptDelete('${post.id}', '')"><i class="fa-solid fa-trash"></i> Delete</button>
+                            </div>
+                        `;
+                    }
+
+                    // NAYA: Safe HTML Box
+                    card.innerHTML = `
+                        ${post.pinned ? `<div class="pin-badge" title="Pinned Post"><i class="fa-solid fa-thumbtack"></i></div>` : ''}
+                        <div class="post-img-container" id="img-${post.id}">
+                            <img src="${post.image}" alt="Post image" class="post-img" loading="lazy" onerror="this.src='https://via.placeholder.com/400?text=Image+Broken'">
+                        </div>
+                        <div class="post-content">
+                            <div class="post-actions">
+                                <div class="action-group">
+                                    <button class="action-btn like-btn ${hasLiked ? 'liked' : ''}" data-id="${post.id}" onclick="toggleLike('${post.id}')" aria-label="Like">
+                                        <i class="${hasLiked ? 'fa-solid' : 'fa-regular'} fa-heart"></i>
+                                    </button>
+                                    <span style="font-weight: 600; font-size: 0.9rem;" class="like-count" data-id="${post.id}">${likesCount}</span>
+                                </div>
+                                <button class="action-btn" onclick="sharePost('${post.id}')" aria-label="Share">
+                                    <i class="fa-regular fa-paper-plane"></i>
+                                </button>
+                            </div>
+                            ${safeCaption ? `<p class="post-caption">${safeCaption}</p>` : ''}
+                            <span class="post-date">${dateStr}</span>
+                            ${adminHtml}
                         </div>
                     `;
-                }
 
-                card.innerHTML = `
-                    ${post.pinned ? `<div class="pin-badge" title="Pinned Post"><i class="fa-solid fa-thumbtack"></i></div>` : ''}
-                    <div class="post-img-container" onclick="openImage('${post.image}')">
-                        <img src="${post.image}" alt="Post image" class="post-img" loading="lazy">
-                    </div>
-                    <div class="post-content">
-                        <div class="post-actions">
-                            <div class="action-group">
-                                <button class="action-btn like-btn ${hasLiked ? 'liked' : ''}" data-id="${post.id}" onclick="toggleLike('${post.id}')" aria-label="Like">
-                                    <i class="${hasLiked ? 'fa-solid' : 'fa-regular'} fa-heart"></i>
-                                </button>
-                                <span style="font-weight: 600; font-size: 0.9rem;" class="like-count" data-id="${post.id}">${likesCount}</span>
-                            </div>
-                            <button class="action-btn" onclick="sharePost('${post.id}')" aria-label="Share">
-                                <i class="fa-regular fa-paper-plane"></i>
-                            </button>
-                        </div>
-                        ${safeCaption ? `<p class="post-caption">${safeCaption}</p>` : ''}
-                        <span class="post-date">${dateStr}</span>
-                        ${adminHtml}
-                    </div>
-                `;
-                fragment.appendChild(card);
+                    fragment.appendChild(card);
+                    
+                    // NAYA: Image ko safe tarike se click karne ka logic
+                    setTimeout(() => {
+                        const imgBox = document.getElementById(`img-${post.id}`);
+                        if(imgBox) {
+                            imgBox.addEventListener('click', () => openImage(post.image));
+                        }
+                    }, 0);
+
+                } catch (error) {
+                    console.error("Ek post render hone me fail hua:", error);
+                }
             });
             
             elements.postsGrid.appendChild(fragment);
