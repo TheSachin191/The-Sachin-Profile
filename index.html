@@ -1499,44 +1499,48 @@
 
         // Open Lightbox globally
         window.openImage = (src) => openLightbox(src);
-
         /* ==========================================
-           RENDER POSTS
+           RENDER POSTS (Crash Proof Version)
            ========================================== */
         const renderPosts = () => {
-            elements.postsGrid.innerHTML = '';
-            
-            let filteredPosts = state.posts.filter(p => !p.hidden || state.isAdmin);
-            
-            if(state.searchQuery) {
-                filteredPosts = filteredPosts.filter(p => 
-                    p.caption && p.caption.toLowerCase().includes(state.searchQuery)
-                );
-            }
+            try {
+                // Check 1: Kya HTML me post box bacha hai?
+                if (!elements.postsGrid) {
+                    alert("Error: HTML me 'postsGrid' naam ka tag gayab ho gaya hai!");
+                    return;
+                }
 
-            if (filteredPosts.length === 0) {
-                elements.postsGrid.innerHTML = `
-                    <div class="empty-state">
-                        <i class="fa-regular fa-folder-open"></i>
-                        <h3>No posts found</h3>
-                        <p>${state.searchQuery ? 'Try a different search term.' : 'Check back later for updates.'}</p>
-                    </div>`;
-                return;
-            }
+                elements.postsGrid.innerHTML = '';
+                
+                let filteredPosts = state.posts.filter(p => !p.hidden || state.isAdmin);
+                
+                if(state.searchQuery) {
+                    filteredPosts = filteredPosts.filter(p => 
+                        p.caption && p.caption.toLowerCase().includes(state.searchQuery)
+                    );
+                }
 
-            const fragment = document.createDocumentFragment();
-            
-            filteredPosts.forEach(post => {
-                // NAYA: Crash Protection Block
-                try { 
-                    // NAYA: Safe Date Handler
+                if (filteredPosts.length === 0) {
+                    elements.postsGrid.innerHTML = `
+                        <div class="empty-state">
+                            <i class="fa-regular fa-folder-open"></i>
+                            <h3>No posts found</h3>
+                        </div>`;
+                    return;
+                }
+
+                const fragment = document.createDocumentFragment();
+                
+                filteredPosts.forEach(post => {
+                    // Safe Date Handler
                     let dateStr = 'Just now';
                     if (post.timestamp && typeof post.timestamp.toDate === 'function') {
                         dateStr = new Date(post.timestamp.toDate()).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
                     }
 
-                    const likesCount = post.likes ? post.likes.length : 0;
-                    const hasLiked = post.likes && post.likes.includes(state.deviceId);
+                    // Safe Likes Handler (Crash yahi hota tha)
+                    const likesCount = (post.likes && Array.isArray(post.likes)) ? post.likes.length : 0;
+                    const hasLiked = (post.likes && Array.isArray(post.likes)) ? post.likes.includes(state.deviceId) : false;
                     const safeCaption = post.caption ? post.caption.replace(/</g, "&lt;").replace(/>/g, "&gt;") : '';
 
                     const card = document.createElement('article');
@@ -1551,47 +1555,50 @@
                         `;
                     }
 
-                    // NAYA: Safe HTML Box
+                    // Safe HTML Builder
                     card.innerHTML = `
-                        ${post.pinned ? `<div class="pin-badge" title="Pinned Post"><i class="fa-solid fa-thumbtack"></i></div>` : ''}
-                        <div class="post-img-container" id="img-${post.id}">
-                            <img src="${post.image}" alt="Post image" class="post-img" loading="lazy" onerror="this.src='https://via.placeholder.com/400?text=Image+Broken'">
+                        ${post.pinned ? `<div class="pin-badge"><i class="fa-solid fa-thumbtack"></i></div>` : ''}
+                        <div class="post-img-container" onclick="openImage('${post.image}')">
+                            <img src="${post.image}" class="post-img" loading="lazy" onerror="this.src='https://via.placeholder.com/400?text=Image+Broken'">
                         </div>
                         <div class="post-content">
                             <div class="post-actions">
                                 <div class="action-group">
-                                    <button class="action-btn like-btn ${hasLiked ? 'liked' : ''}" data-id="${post.id}" onclick="toggleLike('${post.id}')" aria-label="Like">
+                                    <button class="action-btn like-btn ${hasLiked ? 'liked' : ''}" data-id="${post.id}" onclick="toggleLike('${post.id}')">
                                         <i class="${hasLiked ? 'fa-solid' : 'fa-regular'} fa-heart"></i>
                                     </button>
                                     <span style="font-weight: 600; font-size: 0.9rem;" class="like-count" data-id="${post.id}">${likesCount}</span>
                                 </div>
-                                <button class="action-btn" onclick="sharePost('${post.id}')" aria-label="Share">
-                                    <i class="fa-regular fa-paper-plane"></i>
-                                </button>
                             </div>
                             ${safeCaption ? `<p class="post-caption">${safeCaption}</p>` : ''}
                             <span class="post-date">${dateStr}</span>
                             ${adminHtml}
                         </div>
                     `;
-
                     fragment.appendChild(card);
-                    
-                    // NAYA: Image ko safe tarike se click karne ka logic
-                    setTimeout(() => {
-                        const imgBox = document.getElementById(`img-${post.id}`);
-                        if(imgBox) {
-                            imgBox.addEventListener('click', () => openImage(post.image));
-                        }
-                    }, 0);
-
-                } catch (error) {
-                    console.error("Ek post render hone me fail hua:", error);
-                }
-            });
-            
-            elements.postsGrid.appendChild(fragment);
+                });
+                
+                elements.postsGrid.appendChild(fragment);
+                
+            } catch (error) {
+                // YEH ALERT SABSE ZAROORI HAI: Agar code fail hua to reason mobile screen par dikhega
+                alert("RENDER CRASH HUA HAI!\nReason: " + error.message);
+                console.error("Render Error Details: ", error);
+            }
         };
+
+        // Handle URL shared post
+        window.addEventListener('DOMContentLoaded', () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const postId = urlParams.get('post');
+            if(postId && db) {
+                getDoc(doc(db, 'posts', postId)).then(docSnap => {
+                    if(docSnap.exists() && docSnap.data().image) {
+                        openLightbox(docSnap.data().image);
+                    }
+                }).catch(()=>{});
+            }
+        });
 
         // Handle URL shared post
         window.addEventListener('DOMContentLoaded', () => {
